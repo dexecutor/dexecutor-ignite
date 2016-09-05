@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import com.github.dexecutor.core.ExecutionEngine;
-import com.github.dexecutor.core.graph.Dag.Node;
+import com.github.dexecutor.core.graph.Node;
 /**
  * Distributed Execution Engine using Ignite
  * 
