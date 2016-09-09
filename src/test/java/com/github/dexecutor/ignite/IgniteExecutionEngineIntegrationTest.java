@@ -28,7 +28,8 @@ import org.junit.Test;
 import com.github.dexecutor.core.DefaultDependentTasksExecutor;
 import com.github.dexecutor.core.DependentTasksExecutor.ExecutionBehavior;
 import com.github.dexecutor.core.DependentTasksExecutorConfig;
-import com.github.dexecutor.core.TaskProvider;
+import com.github.dexecutor.core.task.Task;
+import com.github.dexecutor.core.task.TaskProvider;
 
 public class IgniteExecutionEngineIntegrationTest {
 
@@ -91,6 +92,8 @@ public class IgniteExecutionEngineIntegrationTest {
 		public Task<Integer, Integer> provid(final Integer id) {
 
 			return new Task<Integer, Integer>() {
+
+				private static final long serialVersionUID = 1L;
 
 				public Integer execute() {
 					try {
