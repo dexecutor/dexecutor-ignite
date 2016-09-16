@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 import com.github.dexecutor.core.task.ExecutionResult;
 import com.github.dexecutor.core.task.Task;
 
-public class SerializableCallable <T, R> implements Callable<ExecutionResult<T,R>>, Serializable {
+public class SerializableCallable <T extends Comparable<T>, R> implements Callable<ExecutionResult<T,R>>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Task<T, R> task;
