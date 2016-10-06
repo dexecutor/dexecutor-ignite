@@ -26,8 +26,8 @@ import org.apache.ignite.Ignition;
 import org.junit.Test;
 
 import com.github.dexecutor.core.DefaultDependentTasksExecutor;
-import com.github.dexecutor.core.DependentTasksExecutor.ExecutionBehavior;
 import com.github.dexecutor.core.DependentTasksExecutorConfig;
+import com.github.dexecutor.core.ExecutionConfig;
 import com.github.dexecutor.core.task.Task;
 import com.github.dexecutor.core.task.TaskProvider;
 
@@ -45,7 +45,7 @@ public class IgniteExecutionEngineIntegrationTest {
 
 			buildGraph(dexecutor);
 			printGraph(dexecutor);
-			dexecutor.execute(ExecutionBehavior.RETRY_ONCE_TERMINATING);
+			dexecutor.execute(ExecutionConfig.TERMINATING);
 			System.out.println("*** Done ***");
 		} finally {
 			try {
