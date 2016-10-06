@@ -47,6 +47,7 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 	private Collection<T> erroredTasks = new CopyOnWriteArraySet<T>();
 
 	private final ExecutorService executorService;
+	//Need Completion service implementation by Ignite.
 	private final CompletionService<ExecutionResult<T,R>> completionService;
 
 	public IgniteExecutionEngine(final ExecutorService executorService) {
