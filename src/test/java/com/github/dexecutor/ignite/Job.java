@@ -21,7 +21,7 @@ public class Job {
 		Ignite ignite = Ignition.start(cfg); 
 
 		if (isMaster) {
-			DefaultDependentTasksExecutor<Integer, Integer> dexecutor = newTaskExecutor(ignite.compute().withAsync());
+			DefaultDependentTasksExecutor<Integer, Integer> dexecutor = newTaskExecutor(ignite.compute());
 
 			buildGraph(dexecutor);
 			dexecutor.execute(ExecutionConfig.TERMINATING);
@@ -63,6 +63,7 @@ public class Job {
 
 				public Integer execute() {
 					try {
+						System.out.println("Executing :*****  " +  getId());
 						Thread.sleep(time(0, 5000));
 					} catch (InterruptedException e) {
 						e.printStackTrace();
