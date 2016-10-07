@@ -54,7 +54,13 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 	private BlockingQueue<Future<ExecutionResult<T,R>>> completionQueue;
 
 	public IgniteExecutionEngine(final IgniteCompute igniteCompute) {
-		checkNotNull(igniteCompute, "Executer Service should not be null");
+		this(igniteCompute, new LinkedBlockingQueue<Future<ExecutionResult<T,R>>>());
+	}
+
+	public IgniteExecutionEngine(final IgniteCompute igniteCompute, BlockingQueue<Future<ExecutionResult<T,R>>> completionQueue) {
+		checkNotNull(igniteCompute, "Executer Service should not be null");		
+		checkNotNull(completionQueue, "BlockingQueue should not be null");
+
 		this.igniteCompute = igniteCompute.withAsync();
 		this.completionQueue = new LinkedBlockingQueue<>();
 	}
