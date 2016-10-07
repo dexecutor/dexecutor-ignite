@@ -20,12 +20,15 @@ package com.github.dexecutor.ignite;
 import static com.github.dexecutor.core.support.Preconditions.checkNotNull;
 
 import java.util.Collection;
-import java.util.concurrent.CompletionService;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.ignite.IgniteCompute;
+import org.apache.ignite.lang.IgniteFuture;
+import org.apache.ignite.lang.IgniteInClosure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,22 +47,36 @@ import com.github.dexecutor.core.task.TaskExecutionException;
 public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements ExecutionEngine<T, R> {
 
 	private static final Logger logger = LoggerFactory.getLogger(IgniteExecutionEngine.class);
+
 	private Collection<T> erroredTasks = new CopyOnWriteArraySet<T>();
 
-	private final ExecutorService executorService;
-	//Need Completion service implementation by Ignite.
-	private final CompletionService<ExecutionResult<T,R>> completionService;
+	private IgniteCompute igniteCompute;
+	private BlockingQueue<Future<ExecutionResult<T,R>>> completionQueue;
 
-	public IgniteExecutionEngine(final ExecutorService executorService) {
-		checkNotNull(executorService, "Executer Service should not be null");
-		this.executorService = executorService;
-		this.completionService = new ExecutorCompletionService<ExecutionResult<T,R>>(executorService);
+	public IgniteExecutionEngine(final IgniteCompute igniteCompute) {
+		checkNotNull(igniteCompute, "Executer Service should not be null");
+		this.igniteCompute = igniteCompute.withAsync();
+		this.completionQueue = new LinkedBlockingQueue<>();
 	}
 
 	@Override
-	public void submit(Task<T, R> task) {
-		logger.debug("Received Task {} ", task.getId());
-		this.completionService.submit(new SerializableCallable<T, R>(task));			
+	public void submit(final Task<T, R> task) {
+		logger.debug("Received Task {}",  task.getId());
+		this.igniteCompute.call(new SerializableCallable<T, R>(task));
+		igniteCompute.future().listen(newListener());
+	}
+
+	private IgniteInClosure<IgniteFuture<Object>> newListener() {
+		return new IgniteInClosure<IgniteFuture<Object>>() {
+
+			private static final long serialVersionUID = 1L;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void apply(IgniteFuture<Object> e) {
+				completionQueue.add(new ValueFuture<ExecutionResult<T,R>>((ExecutionResult<T, R>) e.get()));				
+			}			
+        };
 	}
 
 	@Override
@@ -67,7 +84,7 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 
 		ExecutionResult<T, R> executionResult;
 		try {
-			executionResult = completionService.take().get();
+			executionResult = completionQueue.take().get();
 			if (executionResult.isSuccess()) {				
 				erroredTasks.remove(executionResult.getId());
 			} else {
@@ -87,10 +104,5 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 	@Override
 	public boolean isAnyTaskInError() {
 		return !this.erroredTasks.isEmpty();
-	}
-
-	@Override
-	public String toString() {
-		return this.executorService.toString();
 	}
 }

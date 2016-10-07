@@ -1,8 +1,7 @@
 package com.github.dexecutor.ignite;
 
-import java.util.concurrent.ExecutorService;
-
 import org.apache.ignite.Ignite;
+import org.apache.ignite.IgniteCompute;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
 
@@ -22,8 +21,7 @@ public class Job {
 		Ignite ignite = Ignition.start(cfg); 
 		
 		if (isMaster) {
-			ExecutorService executorService = ignite.executorService();
-			DefaultDependentTasksExecutor<Integer, Integer> dexecutor = newTaskExecutor(executorService);
+			DefaultDependentTasksExecutor<Integer, Integer> dexecutor = newTaskExecutor(ignite.compute().withAsync());
 
 			buildGraph(dexecutor);
 			dexecutor.execute(ExecutionConfig.TERMINATING);
@@ -32,9 +30,9 @@ public class Job {
 		System.out.println("Ctrl+D/Ctrl+Z to stop.");
 	}
 	
-	private DefaultDependentTasksExecutor<Integer, Integer> newTaskExecutor(ExecutorService executorService) {
+	private DefaultDependentTasksExecutor<Integer, Integer> newTaskExecutor(IgniteCompute igniteCompute) {
 		DependentTasksExecutorConfig<Integer, Integer> config = new DependentTasksExecutorConfig<Integer, Integer>(
-				new IgniteExecutionEngine<Integer, Integer>(executorService), new SleepyTaskProvider());
+				new IgniteExecutionEngine<Integer, Integer>(igniteCompute), new SleepyTaskProvider());
 		return new DefaultDependentTasksExecutor<Integer, Integer>(config);
 	}
 
@@ -65,11 +63,15 @@ public class Job {
 
 				public Integer execute() {
 					try {
-						Thread.sleep(500);
+						Thread.sleep(time(0, 5000));
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 					return id;
+				}
+
+				private long time(int Min, int Max) {
+					return Min + (int)(Math.random() * ((Max - Min) + 1));
 				}
 			};
 		}

@@ -1,8 +1,6 @@
 package com.github.dexecutor.ignite;
 
-import java.io.Serializable;
-import java.util.concurrent.Callable;
-
+import org.apache.ignite.lang.IgniteCallable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +8,7 @@ import com.github.dexecutor.core.task.ExecutionResult;
 import com.github.dexecutor.core.task.ExecutionStatus;
 import com.github.dexecutor.core.task.Task;
 
-public class SerializableCallable <T extends Comparable<T>, R> implements Callable<ExecutionResult<T,R>>, Serializable {
+public class SerializableCallable <T extends Comparable<T>, R> implements IgniteCallable<ExecutionResult<T,R>> {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(SerializableCallable.class);
