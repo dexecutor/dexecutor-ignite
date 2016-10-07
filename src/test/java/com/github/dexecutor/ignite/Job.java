@@ -12,14 +12,14 @@ import com.github.dexecutor.core.task.Task;
 import com.github.dexecutor.core.task.TaskProvider;
 
 public class Job {
-	
-	public void run(boolean isMaster, String nodeName) throws Exception {
-		
+
+	public void run(boolean isMaster, final String nodeName) throws Exception {
+
 		IgniteConfiguration cfg = new IgniteConfiguration();
 		cfg.setGridName(nodeName); 
 
 		Ignite ignite = Ignition.start(cfg); 
-		
+
 		if (isMaster) {
 			DefaultDependentTasksExecutor<Integer, Integer> dexecutor = newTaskExecutor(ignite.compute().withAsync());
 
@@ -30,7 +30,7 @@ public class Job {
 		System.out.println("Ctrl+D/Ctrl+Z to stop.");
 	}
 	
-	private DefaultDependentTasksExecutor<Integer, Integer> newTaskExecutor(IgniteCompute igniteCompute) {
+	private DefaultDependentTasksExecutor<Integer, Integer> newTaskExecutor(final IgniteCompute igniteCompute) {
 		DependentTasksExecutorConfig<Integer, Integer> config = new DependentTasksExecutorConfig<Integer, Integer>(
 				new IgniteExecutionEngine<Integer, Integer>(igniteCompute), new SleepyTaskProvider());
 		return new DefaultDependentTasksExecutor<Integer, Integer>(config);
@@ -70,11 +70,10 @@ public class Job {
 					return id;
 				}
 
-				private long time(int Min, int Max) {
-					return Min + (int)(Math.random() * ((Max - Min) + 1));
+				private long time(int min, int max) {
+					return min + (int)(Math.random() * ((max - min) + 1));
 				}
 			};
 		}
 	}
-
 }
