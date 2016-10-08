@@ -1,4 +1,9 @@
 # dexecutor-ignite
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.dexecutor/dexecutor-ignite/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.dexecutor/dexecutor-ignite)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+
 Dexecutor With Distributed Execution Engine (Ignite)
 
 
