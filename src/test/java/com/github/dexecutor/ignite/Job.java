@@ -1,12 +1,15 @@
 package com.github.dexecutor.ignite;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.ignite.Ignite;
-import org.apache.ignite.IgniteCompute;
+import org.apache.ignite.IgniteAtomicLong;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
 
 import com.github.dexecutor.core.DefaultDependentTasksExecutor;
 import com.github.dexecutor.core.DependentTasksExecutorConfig;
+import com.github.dexecutor.core.Duration;
 import com.github.dexecutor.core.ExecutionConfig;
 import com.github.dexecutor.core.task.Task;
 import com.github.dexecutor.core.task.TaskProvider;
@@ -21,18 +24,18 @@ public class Job {
 		Ignite ignite = Ignition.start(cfg); 
 
 		if (isMaster) {
-			DefaultDependentTasksExecutor<Integer, Integer> dexecutor = newTaskExecutor(ignite.compute());
+			DefaultDependentTasksExecutor<Integer, Integer> dexecutor = newTaskExecutor(ignite);
 
 			buildGraph(dexecutor);
-			dexecutor.execute(ExecutionConfig.TERMINATING);
+			dexecutor.execute(new ExecutionConfig().scheduledRetrying(4, new Duration(1, TimeUnit.SECONDS)));
 		}
 
 		System.out.println("Ctrl+D/Ctrl+Z to stop.");
 	}
 	
-	private DefaultDependentTasksExecutor<Integer, Integer> newTaskExecutor(final IgniteCompute igniteCompute) {
+	private DefaultDependentTasksExecutor<Integer, Integer> newTaskExecutor(final Ignite ignite) {
 		DependentTasksExecutorConfig<Integer, Integer> config = new DependentTasksExecutorConfig<Integer, Integer>(
-				new IgniteExecutionEngine<Integer, Integer>(igniteCompute), new SleepyTaskProvider());
+				new IgniteExecutionEngine<Integer, Integer>(ignite.compute()), new SleepyTaskProvider(ignite));
 		return new DefaultDependentTasksExecutor<Integer, Integer>(config);
 	}
 
@@ -54,6 +57,11 @@ public class Job {
 	}
 	
 	private static class SleepyTaskProvider implements TaskProvider<Integer, Integer> {
+		final IgniteAtomicLong count;
+
+		public SleepyTaskProvider(final Ignite ignite) {
+			count = ignite.atomicLong("count", 0, true);
+		}
 
 		public Task<Integer, Integer> provideTask(final Integer id) {
 
@@ -63,6 +71,13 @@ public class Job {
 
 				public Integer execute() {
 					try {
+						if (id == 2) {
+							count.incrementAndGet();
+							System.out.println("Count is " + count.get());
+							if (count.get() < 3) {							
+								throw new IllegalArgumentException("Invalid task");
+							}						
+						}
 						System.out.println("Executing :*****  " +  getId());
 						Thread.sleep(time(0, 5000));
 					} catch (InterruptedException e) {
