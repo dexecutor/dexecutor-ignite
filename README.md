@@ -58,6 +58,7 @@ If you need help using Dexecutor feel free to drop an email or create an issue i
 To help Dexecutor development you are encouraged to provide 
 * Suggestion/feedback/Issue
 * pull requests for new features
+* Star :star2: the project
 
 [![View My profile on LinkedIn](https://static.licdn.com/scds/common/u/img/webpromo/btn_viewmy_160x33.png)](https://in.linkedin.com/pub/nadeem-mohammad/17/411/21)
 
