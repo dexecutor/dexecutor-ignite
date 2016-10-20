@@ -22,7 +22,6 @@ import static com.github.dexecutor.core.support.Preconditions.checkNotNull;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -51,7 +50,7 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 	private Collection<T> erroredTasks = new CopyOnWriteArraySet<T>();
 
 	private IgniteCompute igniteCompute;
-	private BlockingQueue<Future<ExecutionResult<T,R>>> completionQueue;
+	private BlockingQueue<ExecutionResult<T,R>> completionQueue;
 
 	public IgniteExecutionEngine(final IgniteCompute igniteCompute) {
 		this(igniteCompute, new LinkedBlockingQueue<Future<ExecutionResult<T,R>>>());
@@ -80,7 +79,7 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 			@SuppressWarnings("unchecked")
 			@Override
 			public void apply(IgniteFuture<Object> e) {
-				completionQueue.add(new ValueFuture<ExecutionResult<T,R>>((ExecutionResult<T, R>) e.get()));				
+				completionQueue.add((ExecutionResult<T, R>) e.get());				
 			}			
         };
 	}
@@ -90,14 +89,14 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 
 		ExecutionResult<T, R> executionResult;
 		try {
-			executionResult = completionQueue.take().get();
+			executionResult = completionQueue.take();
 			if (executionResult.isSuccess()) {				
 				erroredTasks.remove(executionResult.getId());
 			} else {
 				erroredTasks.add(executionResult.getId());
 			}
 			return executionResult;
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (InterruptedException e) {
 			throw new TaskExecutionException("Task interrupted");
 		}		
 	}
