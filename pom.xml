@@ -69,7 +69,7 @@
 		<version.slf4j>1.7.21</version.slf4j>
 		<version.velocity>1.7</version.velocity>
 		<version.ignite>1.7.0</version.ignite>
-		<version.dexecutor-core>1.1.0</version.dexecutor-core>
+		<version.dexecutor-core>2.0.0</version.dexecutor-core>
 
 
 		<version.maven-compiler-plugin>3.5.1</version.maven-compiler-plugin>

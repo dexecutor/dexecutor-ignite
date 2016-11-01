@@ -23,8 +23,8 @@ import org.apache.ignite.IgniteAtomicLong;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
 
-import com.github.dexecutor.core.DefaultDependentTasksExecutor;
-import com.github.dexecutor.core.DependentTasksExecutorConfig;
+import com.github.dexecutor.core.DefaultDexecutor;
+import com.github.dexecutor.core.DexecutorConfig;
 import com.github.dexecutor.core.Duration;
 import com.github.dexecutor.core.ExecutionConfig;
 import com.github.dexecutor.core.task.Task;
@@ -40,7 +40,7 @@ public class Job {
 		Ignite ignite = Ignition.start(cfg); 
 
 		if (isMaster) {
-			DefaultDependentTasksExecutor<Integer, Integer> dexecutor = newTaskExecutor(ignite);
+			DefaultDexecutor<Integer, Integer> dexecutor = newTaskExecutor(ignite);
 
 			buildGraph(dexecutor);
 			dexecutor.execute(new ExecutionConfig().scheduledRetrying(4, new Duration(1, TimeUnit.SECONDS)));
@@ -49,13 +49,15 @@ public class Job {
 		System.out.println("Ctrl+D/Ctrl+Z to stop.");
 	}
 	
-	private DefaultDependentTasksExecutor<Integer, Integer> newTaskExecutor(final Ignite ignite) {
-		DependentTasksExecutorConfig<Integer, Integer> config = new DependentTasksExecutorConfig<Integer, Integer>(
-				new IgniteExecutionEngine<Integer, Integer>(ignite.compute()), new SleepyTaskProvider(ignite));
-		return new DefaultDependentTasksExecutor<Integer, Integer>(config);
+	private DefaultDexecutor<Integer, Integer> newTaskExecutor(final Ignite ignite) {
+		IgniteDexecutorState<Integer, Integer> dexecutorState = new IgniteDexecutorState<Integer, Integer>("test", ignite);
+		DexecutorConfig<Integer, Integer> config = new DexecutorConfig<Integer, Integer>(
+				new IgniteExecutionEngine<Integer, Integer>(dexecutorState, ignite.compute()), new SleepyTaskProvider(ignite));
+		config.setDexecutorState(dexecutorState);
+		return new DefaultDexecutor<Integer, Integer>(config);
 	}
 
-	private void buildGraph(final DefaultDependentTasksExecutor<Integer, Integer> dexecutor) {
+	private void buildGraph(final DefaultDexecutor<Integer, Integer> dexecutor) {
 		dexecutor.addDependency(1, 2);
 		dexecutor.addDependency(1, 2);
 		dexecutor.addDependency(1, 3);
@@ -87,13 +89,13 @@ public class Job {
 
 				public Integer execute() {
 					try {
-						if (id == 2) {
+						/*if (id == 2) {
 							count.incrementAndGet();
 							System.out.println("Count is " + count.get());
 							if (count.get() < 3) {							
 								throw new IllegalArgumentException("Invalid task");
 							}						
-						}
+						}*/
 						System.out.println("Executing :*****  " +  getId());
 						Thread.sleep(time(0, 5000));
 					} catch (InterruptedException e) {

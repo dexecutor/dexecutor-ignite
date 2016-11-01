@@ -19,9 +19,7 @@ package com.github.dexecutor.ignite;
 
 import static com.github.dexecutor.core.support.Preconditions.checkNotNull;
 
-import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -31,6 +29,7 @@ import org.apache.ignite.lang.IgniteInClosure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.dexecutor.core.DexecutorState;
 import com.github.dexecutor.core.ExecutionEngine;
 import com.github.dexecutor.core.task.ExecutionResult;
 import com.github.dexecutor.core.task.Task;
@@ -47,19 +46,18 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 
 	private static final Logger logger = LoggerFactory.getLogger(IgniteExecutionEngine.class);
 
-	private Collection<T> erroredTasks = new CopyOnWriteArraySet<T>();
-
 	private IgniteCompute igniteCompute;
 	private BlockingQueue<ExecutionResult<T,R>> completionQueue;
+	private final DexecutorState<T, R> dexecutorState;
 
-	public IgniteExecutionEngine(final IgniteCompute igniteCompute) {
-		this(igniteCompute, new LinkedBlockingQueue<Future<ExecutionResult<T,R>>>());
+	public IgniteExecutionEngine(final DexecutorState<T, R> dexecutorState, final IgniteCompute igniteCompute) {
+		this(dexecutorState, igniteCompute, new LinkedBlockingQueue<Future<ExecutionResult<T,R>>>());
 	}
 
-	public IgniteExecutionEngine(final IgniteCompute igniteCompute, BlockingQueue<Future<ExecutionResult<T,R>>> completionQueue) {
+	public IgniteExecutionEngine(final DexecutorState<T, R> dexecutorState, final IgniteCompute igniteCompute, BlockingQueue<Future<ExecutionResult<T,R>>> completionQueue) {
 		checkNotNull(igniteCompute, "Executer Service should not be null");		
 		checkNotNull(completionQueue, "BlockingQueue should not be null");
-
+		this.dexecutorState = dexecutorState;
 		this.igniteCompute = igniteCompute.withAsync();
 		this.completionQueue = new LinkedBlockingQueue<>();
 	}
@@ -90,10 +88,12 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 		ExecutionResult<T, R> executionResult;
 		try {
 			executionResult = completionQueue.take();
-			if (executionResult.isSuccess()) {				
-				erroredTasks.remove(executionResult.getId());
+			if (executionResult.isSuccess()) {
+				this.dexecutorState.removeErrored(executionResult.getId());
+				//erroredTasks.remove(executionResult.getId());
 			} else {
-				erroredTasks.add(executionResult.getId());
+				this.dexecutorState.addErrored(executionResult.getId());
+				//erroredTasks.add(executionResult.getId());
 			}
 			return executionResult;
 		} catch (InterruptedException e) {
@@ -108,6 +108,6 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 
 	@Override
 	public boolean isAnyTaskInError() {
-		return !this.erroredTasks.isEmpty();
+		return this.dexecutorState.erroredCount() > 0;
 	}
 }
