@@ -33,7 +33,11 @@ package com.github.dexecutor.ignite;
 public class Node {
 
 	public static void main(String[] args) throws Exception {
-		new Job().run(isMaster(args[0]), args[1]);
+		if (args.length == 0) {
+			new Job().run(true, "TEST_NODE");
+		} else {			
+			new Job().run(isMaster(args[0]), args[1]);
+		}
 	}
 
 	private static boolean isMaster(String string) {
