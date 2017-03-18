@@ -89,11 +89,9 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 		try {
 			executionResult = completionQueue.take();
 			if (executionResult.isSuccess()) {
-				this.dexecutorState.removeErrored(executionResult.getId());
-				//erroredTasks.remove(executionResult.getId());
+				this.dexecutorState.removeErrored(executionResult);
 			} else {
-				this.dexecutorState.addErrored(executionResult.getId());
-				//erroredTasks.add(executionResult.getId());
+				this.dexecutorState.addErrored(executionResult);
 			}
 			return executionResult;
 		} catch (InterruptedException e) {

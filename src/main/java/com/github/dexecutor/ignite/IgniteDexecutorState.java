@@ -20,6 +20,8 @@ import com.github.dexecutor.core.graph.Node;
 import com.github.dexecutor.core.graph.Traversar;
 import com.github.dexecutor.core.graph.TraversarAction;
 import com.github.dexecutor.core.graph.Validator;
+import com.github.dexecutor.core.task.ExecutionResult;
+import com.github.dexecutor.core.task.ExecutionResults;
 
 public class IgniteDexecutorState<T extends Comparable<T>, R> implements DexecutorState<T, R> {
 
@@ -35,7 +37,7 @@ public class IgniteDexecutorState<T extends Comparable<T>, R> implements Dexecut
 	private IgniteAtomicLong nodesCount;
 	private Collection<Node<T, R>> processedNodes;
 	private Collection<Node<T, R>> discontinuedNodes;
-	private Collection<T> erroredNodes;
+	private Collection<ExecutionResult<T, R>> erroredNodes;
 	
 	public IgniteDexecutorState(final String cacheName, final Ignite ignite) {
 		CACHE_ID_PHASE = cacheName + "-phase";
@@ -80,6 +82,7 @@ public class IgniteDexecutorState<T extends Comparable<T>, R> implements Dexecut
 
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Dag<T, R> getDag() {
 		return (Dag<T, R>) this.distributedCache.get(CACHE_ID_GRAPH);
 	}
@@ -219,15 +222,22 @@ public class IgniteDexecutorState<T extends Comparable<T>, R> implements Dexecut
 	}
 
 	@Override
-	public void addErrored(T id) {
-		this.erroredNodes.add(id);
-		
+	public void addErrored(ExecutionResult<T, R> task) {
+		this.erroredNodes.add(task);		
 	}
 
 	@Override
-	public void removeErrored(T id) {
-		this.erroredNodes.remove(id);
-		
+	public void removeErrored(ExecutionResult<T, R> task) {
+		this.erroredNodes.remove(task);		
+	}
+
+	@Override
+	public ExecutionResults<T, R> getErrored() {
+		ExecutionResults<T, R> result = new ExecutionResults<>();
+		for (ExecutionResult<T, R> r : this.erroredNodes) {
+			result.add(r);
+		}
+		return result;
 	}
 
 	@Override
@@ -240,5 +250,4 @@ public class IgniteDexecutorState<T extends Comparable<T>, R> implements Dexecut
 		// TODO Auto-generated method stub
 		
 	}
-
 }

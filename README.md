@@ -15,6 +15,7 @@ Dexecutor is licensed under **Apache Software License, Version 2.0**.
 
 ## News
 
+* Version **1.0.1** released on 03/18/2017.
 * Version **1.0.0** released on 10/07/2016.
 
 ## Maven Repository
@@ -39,7 +40,7 @@ Alternatively you can  pull Dexecutor from the central maven repository, just ad
 <dependency>
   <groupId>com.github.dexecutor</groupId>
   <artifactId>dexecutor-ignite</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 
