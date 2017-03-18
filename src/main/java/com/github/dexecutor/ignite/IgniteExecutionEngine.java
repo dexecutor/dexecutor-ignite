@@ -39,8 +39,8 @@ import com.github.dexecutor.core.task.TaskExecutionException;
  * 
  * @author Nadeem Mohammad
  *
- * @param <T>
- * @param <R>
+ * @param <T> Type of Node/Task ID
+ * @param <R> Type of Node/Task result
  */
 public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements ExecutionEngine<T, R> {
 

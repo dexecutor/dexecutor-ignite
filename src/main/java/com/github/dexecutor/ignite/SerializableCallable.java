@@ -23,7 +23,13 @@ import org.slf4j.LoggerFactory;
 import com.github.dexecutor.core.task.ExecutionResult;
 import com.github.dexecutor.core.task.ExecutionStatus;
 import com.github.dexecutor.core.task.Task;
-
+/**
+ * 
+ * @author Nadeem Mohammad
+ *
+ * @param <T> Type of Node/Task ID
+ * @param <R> Type of Node/Task result
+ */
 public class SerializableCallable <T extends Comparable<T>, R> implements IgniteCallable<ExecutionResult<T,R>> {
 	
 	private static final long serialVersionUID = 1L;

@@ -19,7 +19,7 @@
  * This package contains classes related distributed execution engine using Ignite
  */
 /**
- * @author nmohammad
+ * @author Nadeem Mohammad
  *
  */
 package com.github.dexecutor.ignite;

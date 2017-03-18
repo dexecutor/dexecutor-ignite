@@ -22,7 +22,13 @@ import com.github.dexecutor.core.graph.TraversarAction;
 import com.github.dexecutor.core.graph.Validator;
 import com.github.dexecutor.core.task.ExecutionResult;
 import com.github.dexecutor.core.task.ExecutionResults;
-
+/**
+ *
+ * @author Nadeem Mohammad
+ *
+ * @param <T> Type of Node/Task ID
+ * @param <R> Type of Node/Task result
+ */
 public class IgniteDexecutorState<T extends Comparable<T>, R> implements DexecutorState<T, R> {
 
 	private final String CACHE_ID_PHASE;
