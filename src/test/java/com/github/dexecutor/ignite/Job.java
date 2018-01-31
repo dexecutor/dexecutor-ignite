@@ -35,7 +35,7 @@ public class Job {
 	public void run(boolean isMaster, final String nodeName) throws Exception {
 
 		IgniteConfiguration cfg = new IgniteConfiguration();
-		cfg.setGridName(nodeName); 
+		cfg.setIgniteInstanceName(nodeName); 
 
 		Ignite ignite = Ignition.start(cfg); 
 

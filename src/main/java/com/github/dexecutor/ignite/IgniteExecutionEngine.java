@@ -108,4 +108,5 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 	public boolean isAnyTaskInError() {
 		return this.dexecutorState.erroredCount() > 0;
 	}
+
 }

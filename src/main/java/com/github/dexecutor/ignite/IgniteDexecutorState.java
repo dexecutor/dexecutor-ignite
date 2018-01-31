@@ -29,7 +29,7 @@ import com.github.dexecutor.core.task.ExecutionResults;
  * @param <T> Type of Node/Task ID
  * @param <R> Type of Node/Task result
  */
-public class IgniteDexecutorState<T extends Comparable<T>, R> implements DexecutorState<T, R> {
+public class IgniteDexecutorState<T, R> implements DexecutorState<T, R> {
 
 	private final String CACHE_ID_PHASE;
 	private final String CACHE_ID_GRAPH;
@@ -70,19 +70,22 @@ public class IgniteDexecutorState<T extends Comparable<T>, R> implements Dexecut
 
         setCfg.setAtomicityMode(TRANSACTIONAL);
         setCfg.setCacheMode(PARTITIONED);
-		this.processedNodes = ignite.set(
+		this.processedNodes = ignite.queue(
 				CACHE_ID_PROCESSED_NODES, // Queue name.
+				0,
 				setCfg       // Collection configuration.
 			);
 		
 		
-		this.discontinuedNodes = ignite.set(
+		this.discontinuedNodes = ignite.queue(
 				CACHE_ID_DISCONDINUED_NODES, // Queue name.
+				0,
 				setCfg       // Collection configuration.
 			);
 		
-		this.erroredNodes = ignite.set(
+		this.erroredNodes = ignite.queue(
 				CACHE_ID_ERRORED_NODES, // Queue name.
+				0,
 				setCfg       // Collection configuration.
 			);
 
@@ -253,6 +256,18 @@ public class IgniteDexecutorState<T extends Comparable<T>, R> implements Dexecut
 
 	@Override
 	public void forcedStop() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTerminate() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRecover() {
 		// TODO Auto-generated method stub
 		
 	}
