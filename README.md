@@ -9,12 +9,19 @@ Dexecutor With Distributed Execution Engine (Ignite)
 
 Refer [wiki](https://github.com/dexecutor/dexecutor-ignite/wiki) or [Project Web site](https://dexecutor.github.io/) for more Details.
 
+| Stable Release Version | Ignite compatibility | Release Date |
+| ------------- | ------------- | ------------|
+| 1.1.0  | 2.3.0 | 2/1/2018 |
+| 1.0.1  | 1.9 | 03/18/2017 |
+
+
 ## License
 
 Dexecutor is licensed under **Apache Software License, Version 2.0**.
 
 ## News
 
+* Version **1.1.0** released on 03/18/2017.
 * Version **1.0.1** released on 03/18/2017.
 * Version **1.0.0** released on 10/07/2016.
 
@@ -40,7 +47,7 @@ Alternatively you can  pull Dexecutor from the central maven repository, just ad
 <dependency>
   <groupId>com.github.dexecutor</groupId>
   <artifactId>dexecutor-ignite</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
