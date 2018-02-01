@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.dexecutor</groupId>
 	<artifactId>dexecutor-ignite</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.1.0</version>
 
 	<name>Distributed Dexecutor Using Ignite</name>
 	<url>https://github.com/dexecutor/dexecutor-ignite</url>
@@ -35,7 +35,7 @@
 		<connection>scm:git:git://github.com/dexecutor/dexecutor-ignite.git</connection>
 		<developerConnection>scm:git:git@github.com:dexecutor/dexecutor-ignite.git</developerConnection>
 		<url>https://github.com/dexecutor/dexecutor-ignite</url>
-		<tag>HEAD</tag>
+		<tag>dexecutor-ignite-1.1.0</tag>
 	</scm>
 
 	<distributionManagement>
