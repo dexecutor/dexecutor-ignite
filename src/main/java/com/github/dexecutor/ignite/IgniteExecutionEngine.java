@@ -58,29 +58,30 @@ public final class IgniteExecutionEngine<T extends Comparable<T>, R> implements 
 		checkNotNull(igniteCompute, "Executer Service should not be null");		
 		checkNotNull(completionQueue, "BlockingQueue should not be null");
 		this.dexecutorState = dexecutorState;
-		this.igniteCompute = igniteCompute.withAsync();
+		this.igniteCompute = igniteCompute;
 		this.completionQueue = new LinkedBlockingQueue<>();
 	}
 
 	@Override
 	public void submit(final Task<T, R> task) {
 		logger.debug("Received Task {}",  task.getId());
-		this.igniteCompute.call(new SerializableCallable<T, R>(task));
-		igniteCompute.future().listen(newListener());
+
+		IgniteFuture<ExecutionResult<T, R>> future = this.igniteCompute.callAsync(new SerializableCallable<T, R>(task));
+		future.listen(newListener());
 	}
 
-	private IgniteInClosure<IgniteFuture<Object>> newListener() {
-		return new IgniteInClosure<IgniteFuture<Object>>() {
+	private IgniteInClosure<IgniteFuture<ExecutionResult<T, R>>> newListener() {
+		return new IgniteInClosure<IgniteFuture<ExecutionResult<T, R>>>() {
 
 			private static final long serialVersionUID = 1L;
 
-			@SuppressWarnings("unchecked")
 			@Override
-			public void apply(IgniteFuture<Object> e) {
-				completionQueue.add((ExecutionResult<T, R>) e.get());				
-			}			
-        };
+			public void apply(IgniteFuture<ExecutionResult<T, R>> e) {
+				completionQueue.add((ExecutionResult<T, R>) e.get());
+			}
+		};
 	}
+
 
 	@Override
 	public ExecutionResult<T, R> processResult() throws TaskExecutionException {
